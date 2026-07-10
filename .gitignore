@@ -1,0 +1,55 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Java / Maven
+target/
+*.class
+
+# Node / frontend
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local environment
+.env
+.env.local
+*.local
+
+# Logs
+*.log
+*.err
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local temp files
+temp/**
+!temp/
+!temp/README.md
+
+# Local-only copyrighted or unverified reference assets.
+# These directories can contain official/game/network materials for local study.
+# Do not commit their contents to GitHub.
+assets/official-reference/**
+!assets/official-reference/
+!assets/official-reference/README.md
+
+assets/fan-reference/**
+!assets/fan-reference/
+!assets/fan-reference/README.md
+
+# AI-generated assets are ignored until each item is reviewed.
+assets/generated/**
+!assets/generated/
+!assets/generated/README.md
+
+# Large local caches
+.cache/
+.tmp/
