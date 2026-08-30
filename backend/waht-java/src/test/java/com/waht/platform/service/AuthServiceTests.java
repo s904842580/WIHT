@@ -1,7 +1,7 @@
 package com.waht.platform.service;
 
-import com.waht.platform.common.exception.BusinessException;
 import com.waht.platform.common.exception.ErrorCode;
+import com.waht.platform.common.exception.ServiceException;
 import com.waht.platform.common.security.JwtTokenProvider;
 import com.waht.platform.common.security.TokenResult;
 import com.waht.platform.dto.LoginRequest;
@@ -24,6 +24,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/**
+ * AuthService 的核心成功与失败分支测试，不依赖真实数据库。
+ */
 class AuthServiceTests {
 
     private final UserMapper userMapper = mock(UserMapper.class);
@@ -62,7 +65,7 @@ class AuthServiceTests {
 
         when(userMapper.selectCount(any())).thenReturn(1L);
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.register(request));
+        ServiceException exception = assertThrows(ServiceException.class, () -> authService.register(request));
 
         assertEquals(ErrorCode.CONFLICT.getCode(), exception.getCode());
     }
@@ -81,7 +84,7 @@ class AuthServiceTests {
 
         when(userMapper.selectOne(any())).thenReturn(user);
 
-        BusinessException exception = assertThrows(BusinessException.class, () -> authService.login(request));
+        ServiceException exception = assertThrows(ServiceException.class, () -> authService.login(request));
 
         assertEquals(ErrorCode.UNAUTHORIZED.getCode(), exception.getCode());
     }

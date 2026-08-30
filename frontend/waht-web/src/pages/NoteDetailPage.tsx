@@ -1,17 +1,26 @@
 import { notesApi } from '@/api/notes';
+import { MarkdownContent } from '@/components/MarkdownContent';
 import { SectionHeader } from '@/components/SectionHeader';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { formatDate } from '@/utils/date';
+import { getErrorMessage } from '@/utils/error';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, FilePenLine, Loader2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 
 // NoteDetailPage 展示单篇公开笔记详情，对接 /api/notes/{slug}。
 export function NoteDetailPage() {
   const { slug } = useParams();
+  const { user } = useAuth();
   const noteQuery = useQuery({
     queryKey: ['notes', slug],
-    queryFn: () => notesApi.getNote(slug!),
+    queryFn: () => notesApi.getNote(slug ?? ''),
     enabled: Boolean(slug),
+  });
+  const myNotesQuery = useQuery({
+    queryKey: ['my-notes'],
+    queryFn: notesApi.listMyNotes,
+    enabled: Boolean(user),
   });
 
   if (noteQuery.isLoading) {
@@ -26,7 +35,7 @@ export function NoteDetailPage() {
   if (noteQuery.isError) {
     return (
       <div className="panel border-vermilion/30 bg-vermilion/5 p-5 text-sm text-vermilion">
-        {(noteQuery.error as Error).message}
+        {getErrorMessage(noteQuery.error)}
       </div>
     );
   }
@@ -35,13 +44,25 @@ export function NoteDetailPage() {
   if (!note) {
     return <div className="panel p-5 text-sm text-ink/60">笔记不存在。</div>;
   }
+  const ownedNote = myNotesQuery.data?.find((managedNote) => managedNote.slug === note.slug);
 
   return (
     <article className="space-y-4">
-      <Link to="/notes" className="focus-ring inline-flex h-10 items-center gap-2 rounded-md px-2 text-sm text-ink/70 hover:bg-black/5">
-        <ArrowLeft size={16} />
-        <span>返回笔记列表</span>
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link to="/notes" className="focus-ring inline-flex h-10 items-center gap-2 rounded-md px-2 text-sm text-ink/70 hover:bg-black/5">
+          <ArrowLeft size={16} />
+          <span>返回笔记列表</span>
+        </Link>
+        {ownedNote ? (
+          <Link
+            to={`/workspace/notes/${ownedNote.id}/edit`}
+            className="focus-ring inline-flex h-10 items-center gap-2 rounded-md bg-vermilion px-4 text-sm font-semibold text-white hover:bg-vermilion/90"
+          >
+            <FilePenLine size={17} />
+            <span>编辑这篇笔记</span>
+          </Link>
+        ) : null}
+      </div>
 
       <div className="panel p-5">
         <SectionHeader title={note.title} description={note.summary ?? undefined} />
@@ -66,7 +87,7 @@ export function NoteDetailPage() {
       </div>
 
       <div className="panel p-5">
-        <div className="whitespace-pre-wrap text-sm leading-7 text-ink/80">{note.content}</div>
+        <MarkdownContent content={note.content} />
       </div>
     </article>
   );

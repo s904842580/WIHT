@@ -1,10 +1,14 @@
 package com.waht.platform.common.exception;
 
+/**
+ * 系统统一错误码，数值与常见 HTTP 状态保持一致，便于接口调用方判断。
+ */
 public enum ErrorCode {
 
     SUCCESS(0, "success"),
     BAD_REQUEST(400, "bad request"),
     UNAUTHORIZED(401, "unauthorized"),
+    FORBIDDEN(403, "forbidden"),
     CONFLICT(409, "conflict"),
     NOT_FOUND(404, "not found"),
     BUSINESS_ERROR(1000, "business error"),

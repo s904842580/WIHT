@@ -1,8 +1,8 @@
 package com.waht.platform.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.waht.platform.common.exception.BusinessException;
 import com.waht.platform.common.exception.ErrorCode;
+import com.waht.platform.common.exception.ServiceException;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.Mac;
@@ -16,6 +16,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * JWT 内容异常时必须稳定返回未登录错误，避免泄露内部解析异常。
+ */
 class JwtTokenProviderTests {
 
     private final JwtProperties jwtProperties = new JwtProperties();
@@ -27,7 +30,7 @@ class JwtTokenProviderTests {
         Map<String, Object> payload = validPayload();
         payload.put("sub", "not-a-number");
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        ServiceException exception = assertThrows(ServiceException.class,
                 () -> jwtTokenProvider.parseToken(signedToken(payload)));
 
         assertEquals(ErrorCode.UNAUTHORIZED.getCode(), exception.getCode());
@@ -38,7 +41,7 @@ class JwtTokenProviderTests {
         Map<String, Object> payload = validPayload();
         payload.remove("username");
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        ServiceException exception = assertThrows(ServiceException.class,
                 () -> jwtTokenProvider.parseToken(signedToken(payload)));
 
         assertEquals(ErrorCode.UNAUTHORIZED.getCode(), exception.getCode());

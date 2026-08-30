@@ -53,3 +53,8 @@ assets/generated/**
 # Large local caches
 .cache/
 .tmp/
+
+# Local-only homepage preview assets.
+# odette-current.avif is user-supplied game material; archive-triptych.webp is unreviewed generated art.
+frontend/waht-web/src/assets/odette-current.avif
+frontend/waht-web/src/assets/archive-triptych.webp

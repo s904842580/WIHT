@@ -30,12 +30,10 @@ Spring Boot 3 后端
 - 数据库表设计可维护。
 - 代码注释充分，便于后续复盘。
 
-## 第二阶段架构
-
-加入前端：
+## 当前前后端架构
 
 ```text
-Next.js 前台
+React + TypeScript + Vite 前台
         |
         v
 Spring Boot 3 API
@@ -45,13 +43,37 @@ Spring Boot 3 API
         +-- MinIO
 ```
 
-前端只做用户可见页面：
+前端同时承载公开页面和轻量作者工作台：
 
 - 首页
 - 学习笔记
 - 项目展示
 - 游戏科普
 - 素材展示
+- 登录、注册
+- 我的笔记与 Markdown 编辑器
+
+认证请求链路：
+
+```text
+浏览器 Authorization: Bearer token
+        |
+        v
+JwtAuthInterceptor：校验签名和有效期
+        |
+        v
+waht_user：再次确认用户存在且状态为 ACTIVE
+        |
+        v
+@LoginUser CurrentUser：注入 Controller 参数
+```
+
+笔记写作链路：
+
+```text
+作者工作台 -> /api/my/notes -> NoteService -> MyBatis-Plus -> MySQL
+公开博客   -> /api/notes    -> PUBLISHED 状态 + 分页与组合筛选
+```
 
 ## 第三阶段架构
 

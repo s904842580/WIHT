@@ -1,8 +1,8 @@
 package com.waht.platform.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.waht.platform.common.exception.BusinessException;
 import com.waht.platform.common.exception.ErrorCode;
+import com.waht.platform.common.exception.ServiceException;
 import com.waht.platform.common.security.CurrentUser;
 import com.waht.platform.common.security.JwtTokenProvider;
 import com.waht.platform.common.security.TokenResult;
@@ -13,11 +13,16 @@ import com.waht.platform.mapper.UserMapper;
 import com.waht.platform.vo.LoginResponse;
 import com.waht.platform.vo.UserInfoResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
+/**
+ * 认证业务服务，集中处理密码校验、用户状态和令牌签发。
+ */
 @Service
 public class AuthService {
 
@@ -36,10 +41,11 @@ public class AuthService {
 
     @Transactional
     public LoginResponse login(LoginRequest request) {
+        String username = request.getUsername().trim().toLowerCase(Locale.ROOT);
         UserEntity user = userMapper.selectOne(new LambdaQueryWrapper<UserEntity>()
-                .eq(UserEntity::getUsername, request.getUsername()));
+                .eq(UserEntity::getUsername, username));
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "用户名或密码错误");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "用户名或密码错误");
         }
         ensureActive(user);
 
@@ -59,11 +65,11 @@ public class AuthService {
 
     @Transactional
     public LoginResponse register(RegisterRequest request) {
-        String username = request.getUsername().trim();
+        String username = request.getUsername().trim().toLowerCase(Locale.ROOT);
         boolean exists = userMapper.selectCount(new LambdaQueryWrapper<UserEntity>()
                 .eq(UserEntity::getUsername, username)) > 0;
         if (exists) {
-            throw new BusinessException(ErrorCode.CONFLICT, "用户名已存在");
+            throw new ServiceException(ErrorCode.CONFLICT, "用户名已存在");
         }
 
         UserEntity user = new UserEntity();
@@ -72,7 +78,11 @@ public class AuthService {
         user.setNickname(resolveNickname(request.getNickname(), username));
         user.setRole(DEFAULT_ROLE);
         user.setStatus(ACTIVE_STATUS);
-        userMapper.insert(user);
+        try {
+            userMapper.insert(user);
+        } catch (DuplicateKeyException ex) {
+            throw new ServiceException(ErrorCode.CONFLICT, "用户名已存在");
+        }
 
         TokenResult tokenResult = jwtTokenProvider.createToken(user);
         return new LoginResponse(
@@ -86,7 +96,7 @@ public class AuthService {
     public UserInfoResponse getCurrentUser(CurrentUser currentUser) {
         UserEntity user = userMapper.selectById(currentUser.userId());
         if (user == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录用户不存在");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录用户不存在");
         }
         ensureActive(user);
         return UserInfoResponse.from(user);
@@ -94,7 +104,7 @@ public class AuthService {
 
     private void ensureActive(UserEntity user) {
         if (!ACTIVE_STATUS.equals(user.getStatus())) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "用户已被禁用");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "用户已被禁用");
         }
     }
 

@@ -1,55 +1,65 @@
 # WAHT
 
-WAHT 是一个以胡桃主题为视觉核心的个人开发平台。当前阶段用于本地学习和项目规划，不急于公开部署。
+WAHT 是一个用于记录学习笔记、展示个人项目和持续练习全栈开发的个人平台。
 
-## 当前定位
+## 当前能力
 
-- 主线：Java 后端能力成长，先使用 Spring Boot 3。
-- 副线：Go、AI、云原生、前端、游戏开发逐步加入。
-- 内容：学习笔记、项目展示、游戏科普、算法可视化、素材整理。
-- 主题：胡桃相关视觉元素，当前仅供个人本地学习使用。
+- Spring Boot 3 + MyBatis-Plus + MySQL 后端。
+- React + TypeScript + Vite 前端。
+- 用户注册、登录、JWT 鉴权、登录态恢复和私有缓存隔离。
+- 学习笔记公开分页、关键词与分类标签筛选、Markdown 详情和浏览次数。
+- 作者工作台：笔记 CRUD、草稿发布、Markdown 工具栏、全屏预览和本地恢复。
+- 笔记分类、标签和项目展示公开查询。
+- 统一 `BaseResponse` 响应和 `ServiceException` 异常处理。
+- 可配置 CORS、请求编号、环境预检和一键构建验证。
 
-## 当前阶段规则
+## 目录说明
 
-- 当前阶段只建立目录、文档和后端规划。
-- 不生成业务代码，避免一次性堆太多。
-- 后端结构由 WAHT 自己维护，不强制参考其他项目。
-- 素材可以先使用网络或官方素材做本地练习，但不要提交公开仓库，不要商用，不要公开部署。
-- 后续可公开展示的素材必须放到 `assets/public-safe/`。
+```text
+backend/waht-java/       Spring Boot 主后端
+frontend/waht-web/       React 用户前台和作者工作台
+database/mysql/          MySQL 初始化与迁移脚本
+docs/                    架构、开发规则和进度文档
+assets/                  素材及素材使用规则
+```
 
-## 规则文档
+## 本地入口
 
-- `docs/directory-rules.md`：目录存放规则。
-- `docs/dev-rules.md`：开发规则。
-- `docs/project-decisions.md`：项目决策记录。
-- `docs/module-plan.md`：模块规划。
-- `docs/runbook-local.md`：本地运行说明。
-- `database/schema-design.md`：数据库设计草稿。
-- `assets/asset-policy.md`：素材使用规则。
+后端默认地址：
 
-## 目录阶段标记
+```text
+http://localhost:8080
+```
 
-- `[NOW]`：当前阶段可以使用或维护。
-- `[NEXT]`：近期要做，但暂不生成代码。
-- `[LATER]`：后续学习到对应技术后再做。
-- `[LOCAL]`：仅本地使用，不建议公开。
+前端默认地址：
 
-## 当前开发节奏
+```text
+http://localhost:5173
+```
 
-按“一天一个小目标”推进。
+常用页面：
 
-当前优先级：
+```text
+/login                   登录
+/register                注册
+/notes                   公开笔记
+/workspace/notes         我的笔记
+/workspace/notes/new     新建笔记
+/projects                项目展示
+```
 
-1. 项目规则和目录。
-2. Spring Boot 3 后端骨架。
-3. MySQL 表设计。
-4. 学习笔记模块。
-5. 项目展示模块。
+详细启动步骤见 `docs/runbook-local.md`，模块进度见 `docs/module-plan.md`，真实结构、依赖、数据库和文档基线见 `docs/project-inventory.md`。
 
-暂不推进：
+首次运行建议执行：
 
-- 前端工程。
-- Go 服务。
-- AI 服务。
-- Docker。
-- k8s。
+```powershell
+.\scripts\check-local.ps1
+.\scripts\verify-project.ps1
+```
+
+## 当前边界
+
+- 保持 Java 单体后端，不提前拆微服务。
+- 暂不接入 Go、AI、Docker 和 Kubernetes。
+- JWT 第一阶段存储在浏览器 `localStorage`，正式公网部署前再评估 HttpOnly Cookie。
+- 版权不明确的素材只用于本地学习，不进入公开发布目录。

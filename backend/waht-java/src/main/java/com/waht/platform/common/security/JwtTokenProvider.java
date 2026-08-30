@@ -3,8 +3,8 @@ package com.waht.platform.common.security;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.waht.platform.common.exception.BusinessException;
 import com.waht.platform.common.exception.ErrorCode;
+import com.waht.platform.common.exception.ServiceException;
 import com.waht.platform.entity.UserEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -19,6 +19,9 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 使用 HMAC-SHA256 创建和验证 WAHT 登录令牌。
+ */
 @Component
 public class JwtTokenProvider {
 
@@ -57,25 +60,25 @@ public class JwtTokenProvider {
 
     public CurrentUser parseToken(String token) {
         if (!StringUtils.hasText(token)) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌不能为空");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌不能为空");
         }
 
         String[] parts = token.split("\\.");
         if (parts.length != 3) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌格式错误");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌格式错误");
         }
 
         String unsignedToken = parts[0] + "." + parts[1];
         String expectedSignature = sign(unsignedToken);
         if (!MessageDigest.isEqual(expectedSignature.getBytes(StandardCharsets.UTF_8),
                 parts[2].getBytes(StandardCharsets.UTF_8))) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌签名无效");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌签名无效");
         }
 
         Map<String, Object> payload = decodeJson(parts[1]);
         long expiresAt = readLongClaim(payload, "exp");
         if (expiresAt <= Instant.now().getEpochSecond()) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌已过期");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌已过期");
         }
 
         Long userId = readLongClaim(payload, "sub");
@@ -98,7 +101,7 @@ public class JwtTokenProvider {
             byte[] json = BASE64_URL_DECODER.decode(value);
             return objectMapper.readValue(json, MAP_TYPE);
         } catch (IllegalArgumentException | IOException ex) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌内容无效");
+            throw new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌内容无效");
         }
     }
 
@@ -140,7 +143,7 @@ public class JwtTokenProvider {
         return Long.parseLong(String.valueOf(value));
     }
 
-    private BusinessException invalidTokenContent() {
-        return new BusinessException(ErrorCode.UNAUTHORIZED, "登录令牌内容无效");
+    private ServiceException invalidTokenContent() {
+        return new ServiceException(ErrorCode.UNAUTHORIZED, "登录令牌内容无效");
     }
 }

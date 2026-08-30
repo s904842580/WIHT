@@ -1,6 +1,6 @@
 package com.waht.platform.controller;
 
-import com.waht.platform.common.api.ApiResponse;
+import com.waht.platform.common.api.BaseResponse;
 import com.waht.platform.service.ProjectService;
 import com.waht.platform.vo.ProjectDetailResponse;
 import com.waht.platform.vo.ProjectSummaryResponse;
@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * 项目展示模块的公开查询接口。
+ */
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
@@ -22,12 +25,12 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ApiResponse<List<ProjectSummaryResponse>> listPublishedProjects() {
-        return ApiResponse.success(projectService.listPublishedProjects());
+    public BaseResponse<List<ProjectSummaryResponse>> listPublishedProjects() {
+        return BaseResponse.success(projectService.listPublishedProjects());
     }
 
     @GetMapping("/{slug}")
-    public ApiResponse<ProjectDetailResponse> getPublishedProject(@PathVariable String slug) {
-        return ApiResponse.success(projectService.getPublishedProjectBySlug(slug));
+    public BaseResponse<ProjectDetailResponse> getPublishedProject(@PathVariable String slug) {
+        return BaseResponse.success(projectService.getPublishedProjectBySlug(slug));
     }
 }

@@ -1,6 +1,7 @@
 import { authApi } from '@/api/auth';
 import { SectionHeader } from '@/components/SectionHeader';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { getErrorMessage } from '@/utils/error';
 import { useMutation } from '@tanstack/react-query';
 import { UserPlus } from 'lucide-react';
 import { FormEvent, useState } from 'react';
@@ -40,7 +41,7 @@ export function RegisterPage() {
     });
   }
 
-  const errorMessage = localError || (registerMutation.isError ? (registerMutation.error as Error).message : '');
+  const errorMessage = localError || (registerMutation.isError ? getErrorMessage(registerMutation.error) : '');
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">

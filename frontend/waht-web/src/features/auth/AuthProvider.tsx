@@ -1,13 +1,15 @@
 import { authApi } from '@/api/auth';
-import { clearStoredToken, getStoredToken, setStoredToken } from '@/api/http';
+import { AUTH_EXPIRED_EVENT, HttpError, clearStoredToken, getStoredToken, setStoredToken } from '@/api/http';
 import type { LoginResult, UserInfo } from '@/types/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type AuthContextValue = {
   token: string | null;
   user: UserInfo | null;
   isChecking: boolean;
+  authCheckError: Error | null;
+  retryAuthCheck: () => void;
   login: (result: LoginResult) => void;
   logout: () => void;
 };
@@ -19,6 +21,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [token, setToken] = useState(() => getStoredToken());
 
+  // 私有查询必须随用户切换清理，避免短暂展示上一个账号的缓存内容。
+  const clearPrivateQueries = useCallback((): void => {
+    void queryClient.cancelQueries({ queryKey: ['my-notes'] });
+    queryClient.removeQueries({ queryKey: ['my-notes'] });
+  }, [queryClient]);
+
   const currentUserQuery = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: authApi.me,
@@ -26,12 +34,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     retry: false,
   });
 
+  useEffect(() => {
+    function clearExpiredLogin(): void {
+      clearStoredToken();
+      setToken(null);
+      queryClient.removeQueries({ queryKey: ['auth'] });
+      clearPrivateQueries();
+    }
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, clearExpiredLogin);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, clearExpiredLogin);
+  }, [clearPrivateQueries, queryClient]);
+
+  useEffect(() => {
+    const error = currentUserQuery.error;
+    if (token && error instanceof HttpError && (error.code === 401 || error.status === 401)) {
+      clearStoredToken();
+      setToken(null);
+      clearPrivateQueries();
+    }
+  }, [clearPrivateQueries, currentUserQuery.error, token]);
+
   const value = useMemo<AuthContextValue>(() => {
     return {
       token,
-      user: currentUserQuery.data ?? null,
-      isChecking: currentUserQuery.isFetching,
+      user: token ? (currentUserQuery.data ?? null) : null,
+      isChecking: Boolean(token) && (currentUserQuery.isPending || currentUserQuery.isFetching),
+      authCheckError: token && currentUserQuery.isError ? currentUserQuery.error : null,
+      retryAuthCheck() {
+        void currentUserQuery.refetch();
+      },
       login(result) {
+        clearPrivateQueries();
         setStoredToken(result.token);
         setToken(result.token);
         queryClient.setQueryData(['auth', 'me'], result.user);
@@ -40,15 +74,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         clearStoredToken();
         setToken(null);
         queryClient.removeQueries({ queryKey: ['auth'] });
+        clearPrivateQueries();
       },
     };
-  }, [currentUserQuery.data, currentUserQuery.isFetching, queryClient, token]);
+  }, [
+    clearPrivateQueries,
+    currentUserQuery.data,
+    currentUserQuery.error,
+    currentUserQuery.isError,
+    currentUserQuery.isFetching,
+    currentUserQuery.isPending,
+    currentUserQuery.refetch,
+    queryClient,
+    token,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 // useAuth 是页面读取登录态的统一入口。
-export function useAuth() {
+export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used inside AuthProvider');

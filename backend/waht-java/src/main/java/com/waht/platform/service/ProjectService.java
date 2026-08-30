@@ -1,8 +1,8 @@
 package com.waht.platform.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.waht.platform.common.exception.BusinessException;
 import com.waht.platform.common.exception.ErrorCode;
+import com.waht.platform.common.exception.ServiceException;
 import com.waht.platform.entity.ProjectEntity;
 import com.waht.platform.entity.ProjectLinkEntity;
 import com.waht.platform.entity.ProjectTechRelEntity;
@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 项目公开查询服务，负责聚合项目、链接和技术栈数据。
+ */
 @Service
 public class ProjectService {
 
@@ -75,7 +78,7 @@ public class ProjectService {
                 .eq(ProjectEntity::getStatus, PUBLISHED_STATUS)
                 .last("LIMIT 1"));
         if (project == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "项目不存在");
+            throw new ServiceException(ErrorCode.NOT_FOUND, "项目不存在");
         }
 
         return ProjectDetailResponse.from(

@@ -28,14 +28,13 @@ backend/
 
 ```text
 frontend/
-  waht-web/        # [NEXT] 用户前台
+  waht-web/        # [NOW] 用户前台和个人写作台
   waht-admin/      # [LATER] 管理后台
 ```
 
 规则：
 
-- 前期可以先不做前端。
-- `waht-web/` 优先于后台。
+- `waht-web/` 已承载公开内容、登录注册和个人笔记写作台。
 - `waht-admin/` 等后端内容管理接口稳定后再做。
 
 ## 数据库目录
@@ -75,7 +74,7 @@ assets/
 
 ```text
 infra/
-  local/          # [NEXT] 本地启动说明
+  local/          # [NOW] 本地启动说明索引
   nginx/          # [LATER] Nginx 配置
   docker/         # [LATER] Docker 配置
   k8s/            # [LATER] k3s/Kubernetes 学习
