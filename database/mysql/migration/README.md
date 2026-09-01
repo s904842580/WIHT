@@ -11,3 +11,4 @@
 ## 当前脚本
 
 - `20260711_001_repair_note_demo_utf8.sql`：修复早期本地导入时损坏的中文笔记演示数据。
+- `20260830_001_add_agent_note_draft_request.sql`：增加 Agent 审批创建笔记的幂等记录表。

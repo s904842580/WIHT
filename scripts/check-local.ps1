@@ -54,6 +54,10 @@ $npmAvailable = Test-CommandAvailable -CommandName 'npm.cmd'
 $npmDetail = if ($npmAvailable) { (& npm.cmd --version) } else { 'npm.cmd is not available in PATH.' }
 Write-CheckResult -Name 'npm' -Passed $npmAvailable -Detail $npmDetail
 
+$pythonAvailable = Test-CommandAvailable -CommandName 'python'
+$pythonDetail = if ($pythonAvailable) { (& python --version) } else { 'Install Python 3.11 or newer and add it to PATH.' }
+Write-CheckResult -Name 'Python' -Passed $pythonAvailable -Detail $pythonDetail
+
 $passwordConfigured = -not [string]::IsNullOrWhiteSpace($env:WAHT_DB_PASSWORD)
 $passwordDetail = if ($passwordConfigured) { 'Configured.' } else { 'Not configured. Reopen the terminal or IDE after setting it.' }
 Write-CheckResult -Name 'WAHT_DB_PASSWORD' -Passed $passwordConfigured -Detail $passwordDetail

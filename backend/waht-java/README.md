@@ -51,6 +51,8 @@ waht-java/
 - 学习笔记公开分页、关键词、分类和标签查询接口。
 - 学习笔记作者工作台 CRUD、草稿和发布接口，含正文大小和关联 ID 校验。
 - 项目展示公开查询接口。
+- Agent Gateway、短期 delegation JWT 和双重认证内部笔记工具。
+- Agent 审批创建草稿的幂等写入。
 - Maven 本地仓库配置：`G:\maven\repository`。
 
 ## 本地命令
@@ -154,6 +156,19 @@ GET http://localhost:8080/api/projects/{slug}
 GET http://localhost:8080/api/tech-stacks
 ```
 
+登录后的学习助手接口：
+
+```text
+GET  http://localhost:8080/api/agent/conversations
+POST http://localhost:8080/api/agent/conversations
+GET  http://localhost:8080/api/agent/conversations/{conversationId}
+POST http://localhost:8080/api/agent/conversations/{conversationId}/messages
+POST http://localhost:8080/api/agent/approvals/{approvalId}
+Authorization: Bearer 登录返回的token
+```
+
+浏览器只调用上述 Java 接口。`/api/internal/agent-tools/**` 仅供 Python 使用，必须同时提供共享服务令牌和 Java 签发的短期 delegation JWT。
+
 第一阶段鉴权规则：
 
 - 放行：`/api/health`
@@ -182,6 +197,11 @@ WAHT_DB_PASSWORD
 WAHT_SERVER_PORT
 WAHT_JWT_SECRET
 WAHT_JWT_EXPIRATION_MINUTES
+WAHT_AGENT_DELEGATION_EXPIRATION_MINUTES
+WAHT_AGENT_BASE_URL
+WAHT_AGENT_SERVICE_TOKEN
+WAHT_AGENT_CONNECT_TIMEOUT_MILLIS
+WAHT_AGENT_READ_TIMEOUT_MILLIS
 WAHT_CORS_ALLOWED_ORIGINS
 ```
 
@@ -191,5 +211,5 @@ WAHT_CORS_ALLOWED_ORIGINS
 
 - 不拆微服务。
 - 不接 Go。
-- 不接 AI。
+- 不做 Agent 流式响应、多 Agent、向量数据库和长期记忆。
 - 不写 Docker。

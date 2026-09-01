@@ -73,6 +73,7 @@ public class GlobalExceptionHandler {
             case 403 -> HttpStatus.FORBIDDEN;
             case 409 -> HttpStatus.CONFLICT;
             case 404 -> HttpStatus.NOT_FOUND;
+            case 503 -> HttpStatus.SERVICE_UNAVAILABLE;
             default -> HttpStatus.BAD_REQUEST;
         };
     }

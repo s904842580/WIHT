@@ -1,5 +1,6 @@
 package com.waht.platform;
 
+import com.waht.platform.agent.mapper.AgentNoteDraftRequestMapper;
 import com.waht.platform.mapper.UserMapper;
 import com.waht.platform.mapper.NoteCategoryMapper;
 import com.waht.platform.mapper.NoteMapper;
@@ -44,6 +45,9 @@ class WahtJavaApplicationTests {
 
     @MockBean
     private ProjectTechRelMapper projectTechRelMapper;
+
+    @MockBean
+    private AgentNoteDraftRequestMapper agentNoteDraftRequestMapper;
 
     @Test
     void contextLoads() {

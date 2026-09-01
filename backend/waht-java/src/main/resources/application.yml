@@ -35,6 +35,12 @@ waht:
     jwt:
       secret: "${WAHT_JWT_SECRET:waht-local-dev-secret-change-me-20260629}"
       expiration-minutes: ${WAHT_JWT_EXPIRATION_MINUTES:120}
+      delegation-expiration-minutes: ${WAHT_AGENT_DELEGATION_EXPIRATION_MINUTES:2}
+  agent:
+    base-url: ${WAHT_AGENT_BASE_URL:http://127.0.0.1:8000}
+    service-token: "${WAHT_AGENT_SERVICE_TOKEN:waht-local-agent-service-token-change-me}"
+    connect-timeout-millis: ${WAHT_AGENT_CONNECT_TIMEOUT_MILLIS:3000}
+    read-timeout-millis: ${WAHT_AGENT_READ_TIMEOUT_MILLIS:60000}
 
 management:
   endpoints:

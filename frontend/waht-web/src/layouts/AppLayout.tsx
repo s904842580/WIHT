@@ -1,5 +1,5 @@
 import { useAuth } from '@/features/auth/AuthProvider';
-import { BookOpen, Boxes, FilePenLine, Gamepad2, Home, Layers3, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { Bot, BookOpen, Boxes, FilePenLine, Gamepad2, Home, Layers3, LogIn, LogOut, UserPlus } from 'lucide-react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -46,18 +46,32 @@ export function AppLayout() {
                 );
               })}
               {user ? (
-                <NavLink
-                  to="/workspace/notes"
-                  className={({ isActive }) =>
-                    [
-                      'focus-ring inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium transition',
-                      isActive ? 'bg-ink text-white' : 'text-ink/70 hover:bg-black/5 hover:text-ink',
-                    ].join(' ')
-                  }
-                >
-                  <FilePenLine size={16} />
-                  <span>写作台</span>
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/workspace/notes"
+                    className={({ isActive }) =>
+                      [
+                        'focus-ring inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium transition',
+                        isActive ? 'bg-ink text-white' : 'text-ink/70 hover:bg-black/5 hover:text-ink',
+                      ].join(' ')
+                    }
+                  >
+                    <FilePenLine size={16} />
+                    <span>写作台</span>
+                  </NavLink>
+                  <NavLink
+                    to="/workspace/agent"
+                    className={({ isActive }) =>
+                      [
+                        'focus-ring inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium transition',
+                        isActive ? 'bg-ink text-white' : 'text-ink/70 hover:bg-black/5 hover:text-ink',
+                      ].join(' ')
+                    }
+                  >
+                    <Bot size={16} />
+                    <span>学习助手</span>
+                  </NavLink>
+                </>
               ) : null}
             </nav>
 

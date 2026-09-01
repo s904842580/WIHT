@@ -1,5 +1,7 @@
 package com.waht.platform.config;
 
+import com.waht.platform.agent.security.AgentDelegationArgumentResolver;
+import com.waht.platform.agent.security.AgentDelegationInterceptor;
 import com.waht.platform.common.security.CurrentUserArgumentResolver;
 import com.waht.platform.common.security.JwtAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +22,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final JwtAuthInterceptor jwtAuthInterceptor;
     private final CurrentUserArgumentResolver currentUserArgumentResolver;
+    private final AgentDelegationArgumentResolver agentDelegationArgumentResolver;
+    private final AgentDelegationInterceptor agentDelegationInterceptor;
     private final CorsProperties corsProperties;
 
     public WebMvcConfig(
             JwtAuthInterceptor jwtAuthInterceptor,
             CurrentUserArgumentResolver currentUserArgumentResolver,
+            AgentDelegationArgumentResolver agentDelegationArgumentResolver,
+            AgentDelegationInterceptor agentDelegationInterceptor,
             CorsProperties corsProperties) {
         this.jwtAuthInterceptor = jwtAuthInterceptor;
         this.currentUserArgumentResolver = currentUserArgumentResolver;
+        this.agentDelegationArgumentResolver = agentDelegationArgumentResolver;
+        this.agentDelegationInterceptor = agentDelegationInterceptor;
         this.corsProperties = corsProperties;
     }
 
@@ -50,6 +58,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(currentUserArgumentResolver);
+        resolvers.add(agentDelegationArgumentResolver);
     }
 
     @Override
@@ -66,7 +75,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/note-tags",
                         "/api/projects",
                         "/api/projects/**",
-                        "/api/tech-stacks"
+                        "/api/tech-stacks",
+                        "/api/internal/agent-tools/**"
                 );
+        registry.addInterceptor(agentDelegationInterceptor)
+                .addPathPatterns("/api/internal/agent-tools/**");
     }
 }

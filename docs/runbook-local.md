@@ -8,6 +8,7 @@
 - Maven 3.9 或兼容版本。
 - Node.js 18 或更高版本。
 - npm。
+- Python 3.11 或更高版本。
 - MySQL 8.x 与 MySQL CLI。
 - 项目目录：`E:\projects\WAHT`。
 
@@ -55,6 +56,11 @@ WAHT_DB_USERNAME
 WAHT_DB_PASSWORD
 WAHT_JWT_SECRET
 WAHT_JWT_EXPIRATION_MINUTES
+WAHT_AGENT_DELEGATION_EXPIRATION_MINUTES
+WAHT_AGENT_BASE_URL
+WAHT_AGENT_SERVICE_TOKEN
+WAHT_AGENT_CONNECT_TIMEOUT_MILLIS
+WAHT_AGENT_READ_TIMEOUT_MILLIS
 WAHT_CORS_ALLOWED_ORIGINS
 ```
 
@@ -67,9 +73,16 @@ mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/proje
 mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/projects/WAHT/database/mysql/init/002_init_admin_user.sql"
 mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/projects/WAHT/database/mysql/init/003_init_note_demo_data.sql"
 mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/projects/WAHT/database/mysql/init/004_init_project_demo_data.sql"
+mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/projects/WAHT/database/mysql/init/005_init_agent_schema.sql"
 ```
 
 已经初始化过数据库时，只执行尚未执行的 `database/mysql/migration` 脚本。不要重复修改并重新执行旧迁移文件。
+
+启用 Agent 时，现有 `waht` 数据库还需要执行：
+
+```powershell
+mysql --default-character-set=utf8mb4 --user=root --password -e "source E:/projects/WAHT/database/mysql/migration/20260830_001_add_agent_note_draft_request.sql"
+```
 
 ## 启动后端
 
@@ -96,6 +109,42 @@ http://localhost:8080/actuator/health
 
 `/api/health` 检查 Web 应用是否响应；`/actuator/health` 还会汇总 Spring Boot 注册的组件健康状态。
 
+## 启动 AI 学习助手
+
+首次安装 Python 依赖：
+
+```powershell
+cd E:\projects\WAHT\backend\ai-service
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+```
+
+Java 和 Python 必须配置相同的共享令牌。以下变量设置在各自的启动终端中：
+
+```powershell
+$env:WAHT_AGENT_SERVICE_TOKEN = '本地随机共享令牌'
+$env:WAHT_AGENT_DB_URL = 'mysql+pymysql://root:你的密码@127.0.0.1:3306/waht_ai?charset=utf8mb4'
+$env:WAHT_CORE_BASE_URL = 'http://127.0.0.1:8080'
+$env:OPENAI_API_KEY = '你的模型服务密钥'
+$env:WAHT_AI_MODEL = '你要使用的模型名称'
+```
+
+启动服务：
+
+```powershell
+cd E:\projects\WAHT
+.\scripts\start-agent.ps1 -Port 8000
+```
+
+检查地址：
+
+```text
+http://127.0.0.1:8000/health
+http://127.0.0.1:5173/workspace/agent
+```
+
+没有配置 `OPENAI_API_KEY` 或 `WAHT_AI_MODEL` 时，会话查询仍可使用，发送消息明确返回 503。
+
 ## 启动前端
 
 首次安装依赖：
@@ -118,6 +167,7 @@ cd E:\projects\WAHT
 http://127.0.0.1:5173/login
 http://127.0.0.1:5173/notes
 http://127.0.0.1:5173/workspace/notes
+http://127.0.0.1:5173/workspace/agent
 ```
 
 ## 构建验证
@@ -129,7 +179,7 @@ cd E:\projects\WAHT
 .\scripts\verify-project.ps1
 ```
 
-该脚本依次运行 `mvn test` 和 `npm run build`。
+该脚本依次运行 Java 测试、前端生产构建和 Python Agent 测试。
 
 ## 常见问题
 

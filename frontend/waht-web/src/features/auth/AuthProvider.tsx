@@ -24,7 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 私有查询必须随用户切换清理，避免短暂展示上一个账号的缓存内容。
   const clearPrivateQueries = useCallback((): void => {
     void queryClient.cancelQueries({ queryKey: ['my-notes'] });
+    void queryClient.cancelQueries({ queryKey: ['agent'] });
     queryClient.removeQueries({ queryKey: ['my-notes'] });
+    queryClient.removeQueries({ queryKey: ['agent'] });
   }, [queryClient]);
 
   const currentUserQuery = useQuery({

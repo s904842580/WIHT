@@ -11,6 +11,7 @@ public enum ErrorCode {
     FORBIDDEN(403, "forbidden"),
     CONFLICT(409, "conflict"),
     NOT_FOUND(404, "not found"),
+    SERVICE_UNAVAILABLE(503, "service unavailable"),
     BUSINESS_ERROR(1000, "business error"),
     INTERNAL_ERROR(500, "internal server error");
 

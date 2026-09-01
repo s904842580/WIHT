@@ -14,3 +14,4 @@
 - `002_init_admin_user.sql`：初始化本地管理员。
 - `003_init_note_demo_data.sql`：初始化学习笔记演示数据。
 - `004_init_project_demo_data.sql`：初始化项目展示演示数据。
+- `005_init_agent_schema.sql`：初始化 Python Agent 独立数据库 `waht_ai` 的会话、运行、工具与审批表。

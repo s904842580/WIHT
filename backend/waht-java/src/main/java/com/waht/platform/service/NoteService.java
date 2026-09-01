@@ -154,6 +154,54 @@ public class NoteService {
                 .toList();
     }
 
+    /**
+     * 给受控 Agent 工具使用的作者笔记检索，结果仍严格限定 created_by。
+     */
+    public List<ManagedNoteSummaryResponse> searchMyNotes(
+            String keyword,
+            Long categoryId,
+            List<Long> requestedTagIds,
+            int requestedLimit,
+            Long userId) {
+        String normalizedKeyword = normalizeNullable(keyword);
+        List<Long> tagIds = requestedTagIds == null
+                ? List.of()
+                : new ArrayList<>(new LinkedHashSet<>(requestedTagIds));
+        List<Long> matchingNoteIds = tagIds.isEmpty()
+                ? List.of()
+                : noteTagRelMapper.selectNoteIdsContainingAllTags(tagIds, tagIds.size());
+        if (!tagIds.isEmpty() && matchingNoteIds.isEmpty()) {
+            return List.of();
+        }
+
+        int limit = Math.max(1, Math.min(requestedLimit, 10));
+        LambdaQueryWrapper<NoteEntity> wrapper = new LambdaQueryWrapper<NoteEntity>()
+                .eq(NoteEntity::getCreatedBy, userId)
+                .and(StringUtils.hasText(normalizedKeyword), condition -> condition
+                        .like(NoteEntity::getTitle, normalizedKeyword)
+                        .or()
+                        .like(NoteEntity::getSummary, normalizedKeyword)
+                        .or()
+                        .like(NoteEntity::getContent, normalizedKeyword))
+                .eq(categoryId != null, NoteEntity::getCategoryId, categoryId)
+                .in(!tagIds.isEmpty(), NoteEntity::getId, matchingNoteIds)
+                .orderByDesc(NoteEntity::getUpdatedAt)
+                .orderByDesc(NoteEntity::getId)
+                .last("LIMIT " + limit);
+        List<NoteEntity> notes = noteMapper.selectList(wrapper);
+        if (notes.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, NoteCategoryResponse> categoryMap = loadCategoryMap(notes);
+        Map<Long, List<NoteTagResponse>> noteTagMap = loadNoteTagMap(notes);
+        return notes.stream()
+                .map(note -> ManagedNoteSummaryResponse.from(
+                        note,
+                        categoryMap.get(note.getCategoryId()),
+                        noteTagMap.getOrDefault(note.getId(), List.of())))
+                .toList();
+    }
+
     public NoteEditorResponse getMyNote(Long noteId, Long userId) {
         NoteEntity note = getOwnedNote(noteId, userId);
         return toEditorResponse(note);

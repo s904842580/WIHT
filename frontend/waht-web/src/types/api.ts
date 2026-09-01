@@ -134,3 +134,74 @@ export type ProjectSummary = {
 export type ProjectDetail = ProjectSummary & {
   description?: string | null;
 };
+
+// Agent 运行状态；WAITING_APPROVAL 表示草稿尚未写入笔记表。
+export type AgentRunStatus =
+  | 'CREATED'
+  | 'RUNNING'
+  | 'WAITING_APPROVAL'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'CANCELLED';
+
+// Agent 回答引用的现有学习笔记。
+export type AgentNoteSource = {
+  noteId: number;
+  title: string;
+  slug: string;
+  status: NoteStatus;
+};
+
+// Agent 生成的结构化笔记草稿，批准前可继续修改。
+export type AgentDraft = {
+  title: string;
+  summary: string;
+  content: string;
+  categoryId: number;
+  tagIds: number[];
+};
+
+// 高风险写操作的审批信息。
+export type AgentApproval = {
+  id: string;
+  status: 'PENDING' | 'APPROVED' | 'EDITED' | 'REJECTED' | string;
+  action: 'CREATE_NOTE_DRAFT' | string;
+  draft: AgentDraft;
+  createdNoteId?: number | null;
+};
+
+// Agent 会话中的一条消息。
+export type AgentMessage = {
+  id: string;
+  role: 'USER' | 'ASSISTANT' | string;
+  content: string;
+  sources: AgentNoteSource[];
+  createdAt: string;
+};
+
+// 左侧会话列表使用的摘要。
+export type AgentConversationSummary = {
+  id: string;
+  title: string;
+  status: 'ACTIVE' | string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// 会话详情包含消息和最多一个当前待审批草稿。
+export type AgentConversationDetail = AgentConversationSummary & {
+  messages: AgentMessage[];
+  pendingApproval?: AgentApproval | null;
+};
+
+// 发送消息或处理审批后的完整结果。
+export type AgentTurn = {
+  conversationId: string;
+  runId: string;
+  status: AgentRunStatus;
+  answer: string;
+  sources: AgentNoteSource[];
+  approval?: AgentApproval | null;
+};
+
+export type AgentApprovalDecision = 'APPROVE' | 'EDIT' | 'REJECT';

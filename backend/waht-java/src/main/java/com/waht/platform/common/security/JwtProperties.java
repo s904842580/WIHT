@@ -22,6 +22,9 @@ public class JwtProperties {
     @Min(1)
     private long expirationMinutes = 120;
 
+    @Min(1)
+    private long delegationExpirationMinutes = 2;
+
     public String getSecret() {
         return secret;
     }
@@ -36,5 +39,13 @@ public class JwtProperties {
 
     public void setExpirationMinutes(long expirationMinutes) {
         this.expirationMinutes = expirationMinutes;
+    }
+
+    public long getDelegationExpirationMinutes() {
+        return delegationExpirationMinutes;
+    }
+
+    public void setDelegationExpirationMinutes(long delegationExpirationMinutes) {
+        this.delegationExpirationMinutes = delegationExpirationMinutes;
     }
 }

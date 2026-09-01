@@ -28,6 +28,22 @@ public interface NoteTagRelMapper {
     })
     List<NoteTagRelEntity> selectByNoteIds(@Param("noteIds") List<Long> noteIds);
 
+    @Select({
+            "<script>",
+            "SELECT note_id",
+            "FROM waht_note_tag_rel",
+            "WHERE tag_id IN",
+            "<foreach collection='tagIds' item='tagId' open='(' separator=',' close=')'>",
+            "#{tagId}",
+            "</foreach>",
+            "GROUP BY note_id",
+            "HAVING COUNT(DISTINCT tag_id) = #{tagCount}",
+            "</script>"
+    })
+    List<Long> selectNoteIdsContainingAllTags(
+            @Param("tagIds") List<Long> tagIds,
+            @Param("tagCount") int tagCount);
+
     @Delete("DELETE FROM waht_note_tag_rel WHERE note_id = #{noteId}")
     int deleteByNoteId(@Param("noteId") Long noteId);
 

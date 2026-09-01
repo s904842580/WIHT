@@ -1,6 +1,7 @@
 import { AppLayout } from '@/layouts/AppLayout';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { AssetsPage } from '@/pages/AssetsPage';
+import { AgentWorkspacePage } from '@/pages/AgentWorkspacePage';
 import { GamesPage } from '@/pages/GamesPage';
 import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/LoginPage';
@@ -30,6 +31,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MyNotesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'workspace/agent',
+        element: (
+          <ProtectedRoute>
+            <AgentWorkspacePage />
           </ProtectedRoute>
         ),
       },

@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +46,23 @@ class JwtTokenProviderTests {
                 () -> jwtTokenProvider.parseToken(signedToken(payload)));
 
         assertEquals(ErrorCode.UNAUTHORIZED.getCode(), exception.getCode());
+    }
+
+    @Test
+    void delegationTokenShouldBeSeparatedFromLoginTokenAndEnforceScope() {
+        CurrentUser user = new CurrentUser(7L, "author", "USER");
+        String token = jwtTokenProvider.createAgentDelegationToken(user, "run-001", Set.of("note:read"));
+
+        AgentDelegation delegation = jwtTokenProvider.parseAgentDelegationToken(token, "note:read");
+
+        assertEquals(7L, delegation.userId());
+        assertEquals("run-001", delegation.runId());
+        assertEquals(Set.of("note:read"), delegation.scopes());
+        assertEquals(ErrorCode.UNAUTHORIZED.getCode(),
+                assertThrows(ServiceException.class, () -> jwtTokenProvider.parseToken(token)).getCode());
+        assertEquals(ErrorCode.FORBIDDEN.getCode(),
+                assertThrows(ServiceException.class,
+                        () -> jwtTokenProvider.parseAgentDelegationToken(token, "note:create-draft")).getCode());
     }
 
     private Map<String, Object> validPayload() {

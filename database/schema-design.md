@@ -278,3 +278,15 @@ waht_asset
 - 评论表：当前没有互动需求。
 - 游戏科普专表：先用 `waht_note_category` 区分。
 - 文件分片、上传任务表：当前素材文件不由后端完整管理。
+# Agent 数据补充
+
+AI 学习助手使用独立数据库 `waht_ai`，不直接查询 `waht` 业务表。
+
+- `agent_conversation`：用户学习会话。
+- `agent_message`：对话消息与笔记来源摘要。
+- `agent_run`：模型运行状态、用量和错误摘要。
+- `agent_tool_call`：脱敏后的工具调用记录。
+- `agent_approval`：待确认笔记草稿和审批结果。
+- `waht.waht_agent_note_draft_request`：审批 ID 与最终笔记 ID 的幂等映射。
+
+完整建表语句见 `database/mysql/init/005_init_agent_schema.sql` 和 `database/mysql/migration/20260830_001_add_agent_note_draft_request.sql`。

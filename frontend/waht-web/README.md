@@ -77,6 +77,7 @@ http://localhost:5173/notes/spring-boot-auth-flow
 http://localhost:5173/workspace/notes
 http://localhost:5173/workspace/notes/new
 http://localhost:5173/workspace/notes/{noteId}/edit
+http://localhost:5173/workspace/agent
 ```
 
 写作流程：
@@ -89,6 +90,8 @@ http://localhost:5173/workspace/notes/{noteId}/edit
 登录后，公开笔记列表会显示管理笔记和新建笔记入口；打开本人发布的笔记详情时，也可以直接点击编辑这篇笔记进入编辑器。公开阅读页本身不直接进入编辑状态，避免访客误操作。
 
 token 失效或用户被禁用时，请求层会清理本地 token，受保护路由会跳回登录页。
+
+学习助手当前使用非流式响应，可搜索和读取当前用户笔记。生成笔记时先展示可编辑草稿，只有用户批准后才会写入“我的笔记”，并保持 `DRAFT` 状态。
 
 根组件使用全局错误边界，组件渲染异常时会显示刷新入口，并把详细错误写入浏览器控制台。
 
