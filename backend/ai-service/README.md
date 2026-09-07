@@ -12,7 +12,13 @@ Python 3.11+、FastAPI、Pydantic、HTTPX、OpenAI Agents SDK、SQLAlchemy 和 p
 2. 执行 python -m venv .venv。
 3. 执行 .venv\Scripts\python.exe -m pip install -e ".[dev]"。
 4. 设置 OPENAI_API_KEY、WAHT_AGENT_DB_URL 等环境变量。
-5. 执行 .venv\Scripts\python.exe -m uvicorn waht_agent.main:app --host 127.0.0.1 --port 8000。
+5. 执行 `.venv\Scripts\python.exe src\waht_agent\main.py`，或者在 PyCharm 中直接运行 `main.py`。
+
+`main.py` 会通过 Uvicorn 启动服务，并读取 `WAHT_AGENT_HOST` 和 `WAHT_AGENT_PORT`；默认监听 `127.0.0.1:8000`。需要 Uvicorn 自动重载时，仍可使用标准命令：
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn waht_agent.main:app --host 127.0.0.1 --port 8000 --reload
+```
 
 MySQL 首次执行 `database/mysql/init/005_init_agent_schema.sql`。Java 的 `WAHT_AGENT_SERVICE_TOKEN` 必须和本服务相同。
 

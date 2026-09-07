@@ -1,6 +1,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -69,3 +70,18 @@ def create_app(
 
 
 app = create_app()
+
+
+def run_server() -> None:
+    """支持在 PyCharm 中直接运行 main.py 启动本地 Agent 服务。"""
+    settings = get_settings()
+    uvicorn.run(
+        app,
+        host=settings.agent_host,
+        port=settings.agent_port,
+    )
+
+
+if __name__ == "__main__":
+    run_server()
+
