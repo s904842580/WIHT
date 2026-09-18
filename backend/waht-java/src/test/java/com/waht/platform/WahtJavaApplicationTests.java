@@ -20,6 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 class WahtJavaApplicationTests {
 
     @MockBean
+    private com.waht.platform.audit.AuditMapper auditMapper;
+
+    @MockBean
     private UserMapper userMapper;
 
     @MockBean

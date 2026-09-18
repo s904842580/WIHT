@@ -1,6 +1,7 @@
 package com.waht.platform.controller;
 
 import com.waht.platform.common.api.BaseResponse;
+import com.waht.platform.audit.Audited;
 import com.waht.platform.common.security.CurrentUser;
 import com.waht.platform.common.security.LoginUser;
 import com.waht.platform.dto.NoteSaveRequest;
@@ -47,6 +48,7 @@ public class MyNoteController {
     }
 
     @PostMapping
+    @Audited(module = "NOTE", action = "NOTE_CREATE")
     public BaseResponse<NoteEditorResponse> createNote(
             @Valid @RequestBody NoteSaveRequest request,
             @LoginUser CurrentUser currentUser) {
@@ -54,6 +56,7 @@ public class MyNoteController {
     }
 
     @PutMapping("/{noteId}")
+    @Audited(module = "NOTE", action = "NOTE_UPDATE", resource = "noteId")
     public BaseResponse<NoteEditorResponse> updateNote(
             @PathVariable Long noteId,
             @Valid @RequestBody NoteSaveRequest request,
@@ -62,6 +65,7 @@ public class MyNoteController {
     }
 
     @PostMapping("/{noteId}/publish")
+    @Audited(module = "NOTE", action = "NOTE_PUBLISH", resource = "noteId")
     public BaseResponse<NoteEditorResponse> publishNote(
             @PathVariable Long noteId,
             @LoginUser CurrentUser currentUser) {
@@ -69,6 +73,7 @@ public class MyNoteController {
     }
 
     @PostMapping("/{noteId}/draft")
+    @Audited(module = "NOTE", action = "NOTE_UNPUBLISH", resource = "noteId")
     public BaseResponse<NoteEditorResponse> moveNoteToDraft(
             @PathVariable Long noteId,
             @LoginUser CurrentUser currentUser) {
@@ -76,6 +81,7 @@ public class MyNoteController {
     }
 
     @DeleteMapping("/{noteId}")
+    @Audited(module = "NOTE", action = "NOTE_DELETE", resource = "noteId")
     public BaseResponse<Void> deleteNote(
             @PathVariable Long noteId,
             @LoginUser CurrentUser currentUser) {

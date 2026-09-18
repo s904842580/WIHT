@@ -1,4 +1,5 @@
 import { AppLayout } from '@/layouts/AppLayout';
+import { AuditLogsPage } from '@/pages/AuditLogsPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { AssetsPage } from '@/pages/AssetsPage';
 import { AgentWorkspacePage } from '@/pages/AgentWorkspacePage';
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <AppLayout />,
     children: [
+      { path: 'workspace/audit', element: <ProtectedRoute><AuditLogsPage /></ProtectedRoute> },
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },

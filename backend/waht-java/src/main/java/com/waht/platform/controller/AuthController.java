@@ -1,6 +1,7 @@
 package com.waht.platform.controller;
 
 import com.waht.platform.common.api.BaseResponse;
+import com.waht.platform.audit.Audited;
 import com.waht.platform.common.security.CurrentUser;
 import com.waht.platform.common.security.LoginUser;
 import com.waht.platform.dto.LoginRequest;
@@ -29,11 +30,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Audited(module = "AUTH", action = "LOGIN")
     public BaseResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return BaseResponse.success(authService.login(request));
     }
 
     @PostMapping("/register")
+    @Audited(module = "AUTH", action = "REGISTER")
     public BaseResponse<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         return BaseResponse.success(authService.register(request));
     }

@@ -59,6 +59,11 @@ export function AppLayout() {
                     <FilePenLine size={16} />
                     <span>写作台</span>
                   </NavLink>
+                  {user.role === 'ADMIN' ? (
+                    <NavLink to="/workspace/audit" className={({ isActive }) =>
+                      `focus-ring inline-flex h-10 items-center rounded-md px-3 text-sm font-medium ${isActive ? 'bg-ink text-white' : 'text-ink/70 hover:bg-black/5'}`
+                    }>操作审计</NavLink>
+                  ) : null}
                   <NavLink
                     to="/workspace/agent"
                     className={({ isActive }) =>

@@ -12,6 +12,7 @@ WAHT 是一个用于记录学习笔记、展示个人项目和持续练习全栈
 - 笔记分类、标签和项目展示公开查询。
 - 统一 `BaseResponse` 响应和 `ServiceException` 异常处理。
 - 可配置 CORS、请求编号、环境预检和一键构建验证。
+- 操作审计：登录、笔记写操作、AI 操作留痕及管理员只读筛选查询；启用前需执行新增审计表迁移，见 [审计说明](docs/audit-log.md)。
 
 ## 目录说明
 
@@ -45,6 +46,7 @@ http://localhost:5173
 /notes                   公开笔记
 /workspace/notes         我的笔记
 /workspace/notes/new     新建笔记
+/workspace/audit         管理员操作审计
 /projects                项目展示
 ```
 

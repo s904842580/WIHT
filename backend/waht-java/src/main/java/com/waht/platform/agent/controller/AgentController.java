@@ -8,6 +8,7 @@ import com.waht.platform.agent.vo.AgentConversationDetailResponse;
 import com.waht.platform.agent.vo.AgentConversationSummaryResponse;
 import com.waht.platform.agent.vo.AgentTurnResponse;
 import com.waht.platform.common.api.BaseResponse;
+import com.waht.platform.audit.Audited;
 import com.waht.platform.common.security.CurrentUser;
 import com.waht.platform.common.security.LoginUser;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class AgentController {
     }
 
     @PostMapping("/conversations")
+    @Audited(module = "AGENT", action = "CONVERSATION_CREATE")
     public BaseResponse<AgentConversationSummaryResponse> createConversation(
             @Valid @RequestBody CreateAgentConversationRequest request,
             @LoginUser CurrentUser currentUser) {
@@ -54,6 +56,7 @@ public class AgentController {
     }
 
     @PostMapping("/conversations/{conversationId}/messages")
+    @Audited(module = "AGENT", action = "AGENT_MESSAGE", resource = "conversationId")
     public BaseResponse<AgentTurnResponse> sendMessage(
             @PathVariable String conversationId,
             @Valid @RequestBody SendAgentMessageRequest request,
@@ -62,6 +65,7 @@ public class AgentController {
     }
 
     @PostMapping("/approvals/{approvalId}")
+    @Audited(module = "AGENT", action = "AGENT_APPROVAL", resource = "approvalId")
     public BaseResponse<AgentTurnResponse> decideApproval(
             @PathVariable String approvalId,
             @Valid @RequestBody DecideAgentApprovalRequest request,

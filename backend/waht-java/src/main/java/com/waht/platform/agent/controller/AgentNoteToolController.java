@@ -9,6 +9,7 @@ import com.waht.platform.agent.vo.AgentNoteDetailResponse;
 import com.waht.platform.agent.vo.AgentNoteMetadataResponse;
 import com.waht.platform.agent.vo.AgentNoteSearchItemResponse;
 import com.waht.platform.common.api.BaseResponse;
+import com.waht.platform.audit.Audited;
 import com.waht.platform.common.security.AgentDelegation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -58,6 +59,7 @@ public class AgentNoteToolController {
     }
 
     @PostMapping("/note-drafts")
+    @Audited(module = "AGENT", action = "AGENT_DRAFT_CREATE")
     public BaseResponse<AgentCreatedNoteResponse> createDraft(
             @Valid @RequestBody AgentNoteDraftRequest request,
             @RequestHeader("Idempotency-Key")

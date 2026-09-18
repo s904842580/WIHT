@@ -12,3 +12,4 @@
 
 - `20260711_001_repair_note_demo_utf8.sql`：修复早期本地导入时损坏的中文笔记演示数据。
 - `20260830_001_add_agent_note_draft_request.sql`：增加 Agent 审批创建笔记的幂等记录表。
+- `20260918_001_add_audit_log.sql`：增加操作审计表。新旧安装均需在基础初始化后执行；上线与回滚说明见 [操作审计模块](../../../docs/audit-log.md)。

@@ -25,8 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearPrivateQueries = useCallback((): void => {
     void queryClient.cancelQueries({ queryKey: ['my-notes'] });
     void queryClient.cancelQueries({ queryKey: ['agent'] });
+    void queryClient.cancelQueries({ queryKey: ['audit'] });
     queryClient.removeQueries({ queryKey: ['my-notes'] });
     queryClient.removeQueries({ queryKey: ['agent'] });
+    queryClient.removeQueries({ queryKey: ['audit'] });
   }, [queryClient]);
 
   const currentUserQuery = useQuery({

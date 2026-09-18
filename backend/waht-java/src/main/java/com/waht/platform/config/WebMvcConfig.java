@@ -1,6 +1,7 @@
 package com.waht.platform.config;
 
 import com.waht.platform.agent.security.AgentDelegationArgumentResolver;
+import com.waht.platform.audit.AuditInterceptor;
 import com.waht.platform.agent.security.AgentDelegationInterceptor;
 import com.waht.platform.common.security.CurrentUserArgumentResolver;
 import com.waht.platform.common.security.JwtAuthInterceptor;
@@ -25,18 +26,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final AgentDelegationArgumentResolver agentDelegationArgumentResolver;
     private final AgentDelegationInterceptor agentDelegationInterceptor;
     private final CorsProperties corsProperties;
+    private final AuditInterceptor auditInterceptor;
 
     public WebMvcConfig(
             JwtAuthInterceptor jwtAuthInterceptor,
             CurrentUserArgumentResolver currentUserArgumentResolver,
             AgentDelegationArgumentResolver agentDelegationArgumentResolver,
             AgentDelegationInterceptor agentDelegationInterceptor,
-            CorsProperties corsProperties) {
+            CorsProperties corsProperties,
+            AuditInterceptor auditInterceptor) {
         this.jwtAuthInterceptor = jwtAuthInterceptor;
         this.currentUserArgumentResolver = currentUserArgumentResolver;
         this.agentDelegationArgumentResolver = agentDelegationArgumentResolver;
         this.agentDelegationInterceptor = agentDelegationInterceptor;
         this.corsProperties = corsProperties;
+        this.auditInterceptor = auditInterceptor;
     }
 
     @Override
@@ -63,6 +67,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // Run before authentication so denied attempts are recorded too.
+        registry.addInterceptor(auditInterceptor).addPathPatterns("/api/**").order(-100);
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
